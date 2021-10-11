@@ -1,0 +1,70 @@
+11 October 2021 from 9pm to 11:30pm
+
+Following the README.md file, I learned about Harversine formula. 
+
+I searched Java standard libraries for said formula and found two alternative packages that provide the formula: 
+
+org.apache.lucene.spatial.util.GeoDistanceUtils 
+
+org.apache.lucene.util.SloppyMath 
+
+The first alternative is more accurate; the second is faster.
+
+Requirements and Design Musings:
+
+* The user can search with a Postcode and Locality and promptly get a response.
+- SloppyMath will be preferred.
+
+* The pair of Postcode and Locality is unique, but each field on its own is not.
+- The user might be prompted to clarify the intented postcode/location
+
+* Categorise and organise nearby suburbs to close (within 10km) and fringe (within 50km).
+- This can be done by invoking the harversin method
+
+* Maximum 15 nearby suburbs returned for each search.
+- To ensure execution speed, 15 nearby suburbs should be returned in less than 3 seconds or the list is cut short.
+- This can be verified by testing the application for a variety of suburbs and locality inputs.
+
+* Maximum 15 fringe suburbs returned for each search.
+- The same as above, 15 fringe suburbs are identified in less than 3 seconds or the list is cut short.
+- This can be verified by testing the application for a variety of suburbs and locality inputs.
+
+* Results should be ordered by nearest to furthest.
+- This can be achieved by invoking a sorting method before printing the results to the user.
+
+* Should start up and be ready for search quickly.
+- No preprocessing before user input is received should ensure readiness.
+- Preprocessing may occur during user input to ensure results can be obtained and displayed quickly, if convenient to implement.
+
+* Provide an interactive command line interface. Make the input case-insensitive.
+- This is a standard requirement for testing.
+
+UI/UX Design Considerations:
+
+Step 1: Print "Please enter either a postcode or a suburb name:"
+Validate and identify input (postcode or name)
+If postcode and there is more than one suburb under it, then
+Step 2: Print suburbs under that post code and ask for input clarification
+Validate and process input
+Step 3: Show 2 lists, one of nearby suburbs one of fringe suburbs, according to the requirements
+
+Error handling:
+if no suburbs are found, inform the user instead of simply printing empty lists
+
+Development Environment:
+
+Windows 10 with Linux command line (git)
+InteliiJ IDEA
+
+I added the base project to github, so the project is ready for version control.
+
+I have stop working today, so I will resume work tomorrow. I belive the following steps would be:
+
+- Decide which library to use for input validation and write a class to handle (validate) user input
+- Write the unit test for the method that will invoke harversin to ensure distances are calculated correctly
+- Write a class to bear the method that calculates the distance between two cities
+- Write a superclass with interfaces to generate and sort lists by distance nearest to furthest
+- Write two classes extending the superclass, one for nearby suburbs, one for fringe suburbs.
+- Write the main method.
+
+
