@@ -68,3 +68,92 @@ I have stop working today, so I will resume work tomorrow. I belive the followin
 - Write the main method.
 
 
+12 October 2021 from 6:30pm to 8:00pm
+
+Since yesterday, I gave some thought about how to ensure the distance between two cities is being calculated correclty.
+
+I believe the test data can simply be a list of fictitious cities with convenience locations that make it easy to know the distance between them.
+Since the circumference of Earth is a well known number and calculating the distance between parallels (latitude lines) and meridians (longitude lines)
+at the Equator is trivial (Earth's circumference/360), and it is typically rounded to be the same as the distance between parallels (110 Km). 
+
+Reference: https://www.geographyrealm.com/latitude-longitude/
+
+That means we can have a list of cities with the same longitude (e.g. 0 degrees at the Prime Meridian), varying only the latitude.
+We can also have a list of cities with the same latitude (in this case it must be 0 degrees at the Equator), varying only the longitude.
+The distance between any 2 cities would always be the same. That is too far apart for our purposes, so we will consider using subdivisions of 1 degree.
+
+1 degree = 60 minutes
+1 minute = 1/60 degrees = 0.01666667 degrees
+Eath's circumference = 40,075 Km
+
+40,075 / (360 * 60) = 1.85 Km
+Threfore, 1.85 Km is the distance between any 2 cities.
+
+So, for testing purposes, we will find a city at every minute (every 0.01666667° decimal degrees of latitude).
+Alternatively, we can have a city at every 0.01666667° decimal degrees of longitude along the Equator, with equivalent results.
+To prove this is right, we will use Nasa's Terrestrial Planet Mileage Calculator (https://nssdc.gsfc.nasa.gov/special/):
+
+Test Data 1
+Point A: Latitude 0 Longitude 0
+Point B: Latitude 0.01666667 Longitude 0
+Nasa's result = 1.9Km distance
+
+Test Data 2
+Point A: Latitude 0 Longitude 0
+Point B: Latitude 0 Longitude 0.01666667
+Nasa's result = 1.9Km distance
+
+However, Nasa is rounding the numbers. It can be seen by entering the double the distance in decimal degrees (0.01666667 * 2 = 0.03333334‬), which yields the following:
+
+Test Data 3
+Point A: Latitude 0 Longitude 0
+Point B: Latitude 0 Longitude 0.03333334‬
+Nasa's result = 3.7Km distance
+
+3.7 Km / 2 = 1.85 Km. 
+Therefore, our calculations are correct. And the test results can be built around the knowledge that each city in the test data should be 1.85 Km apart from each other.
+
+Choosing a convenient library for input validation:
+
+For this type of input, which is either a 4 digit number or the name of a place we could use simple regex.
+Therefore, java.util.regex.Pattern might be our library of choice here, simply comparing String and Pattern to validate inputs.
+Now that the most important design considerations are dealt with, we can code the solution.
+
+Libraries to be added as dependencies:
+
+org.apache.lucene.util.SloppyMath
+java.util.regex.Pattern
+
+To-Do list:
+- Create test data.
+- Write unit tests.
+- Write the method to calculate distances between suburbs (in meters with no decimals) and run tests with the test data.
+- Ensure method passes all tests.
+- Write unit tests for an input handler to ensure Australian postcodes and suburb names only are received from the user.
+- Write an input handler with validation.
+- Ensure input handler passes all tests.
+- Write a class SuburbFinder with methods to find X suburbs by any given range, receiving X, minimum distance and maximum distance as parameters.
+- Instantiate two objects of that class, one with minimum distance = 0 and maximum distance = 10000m, the other with minimum distance = 100001m and maximum distance = 50000m
+- Refactor to patterns to make the code more robust.
+
+Refactoring Musings:
+
+We can use the SurburbFinder class to encapsulate some business logic by using a Factory pattern and an Enum type.
+That way there is no need to deal with numbers when instantiating the objects. We can simply do something like:
+
+enum Distance{
+  NEARBY,
+  FRINGE
+}
+
+SuburbFinderFactory = new SuburbFinderFactory();
+SuburbFinder NearbySuburbFinder = SuburbFinderFactory.getSuburbFinder(Distance.NEARBY);
+SuburbFinder FringeSuburbFinder = SuburbFinderFactory.getSuburbFinder(Distance.FRINGE);
+
+Since we do not want repeated values, we can use a Set<E> to store the suburbs we find.
+The method calls could look something like:
+
+Set NearbySuburnbSet = new Set<Suburb>;
+NearbySuburbSet.addAll(NearbySuburbFinder.find(15, 3000));
+
+Where NearbySuburbFinder.find(15, 3000) returns a Collection<Suburb> object with up to 15 Suburb objects (basically, JSON data) in 3000 seconds or less.
